@@ -6,16 +6,18 @@ import {SimpleWebsitePipeline} from "./simple-website-pipeline";
 class SimpleWebsitePipelineStack extends cdk.Stack {
   constructor(parent: cdk.App, name: string, props?: cdk.StackProps) {
     super(parent, name, props);
-
     new SimpleWebsitePipeline(this, process.env.CDK_DEPLOY_STACKNAME as string, {
-      github: {
+      /*github: {
         owner: process.env.CDK_DEPLOY_GITHUB_OWNER as string,
         repository: process.env.CDK_DEPLOY_GITHUB_REPOSITORY as string,
         branch: process.env.CDK_DEPLOY_GITHUB_BRANCH as string,
         oauthToken: process.env.CDK_DEPLOY_GITHUB_OAUTH_TOKEN as string
-      },
+      },*/
       bucket: {
         arn: process.env.CDK_DEPLOY_BUCKET_ARN as string
+      },
+      codeRepo:{
+        repoName: process.env.CDK_CODECOMMIT_REPO as string
       }
     });
   }

@@ -2,17 +2,21 @@ import * as cdk from "@aws-cdk/core";
 import * as codepipeline from "@aws-cdk/aws-codepipeline";
 import * as codebuild from "@aws-cdk/aws-codebuild";
 import * as codepipelineActions from "@aws-cdk/aws-codepipeline-actions";
+import * as codecommit from "@aws-cdk/aws-codecommit";
 import * as s3 from "@aws-cdk/aws-s3";
 
 export interface SimpleWebsitePipelineStackProps extends cdk.StackProps {
-  github: {
+  /*github: {
     owner: string
     repository: string
     branch: string
     oauthToken: string
-  }
+  }*/
   bucket: {
     arn: string
+  }
+  codeRepo: {
+    repoName: string
   }
 }
 
@@ -22,17 +26,24 @@ export class SimpleWebsitePipeline extends cdk.Construct {
 
     const outputSources = new codepipeline.Artifact();
     const outputWebsite = new codepipeline.Artifact();
+    const code = codecommit.Repository.fromRepositoryName(this, 'ImportedRepo', props.codeRepo.repoName);
+
 
     const pipeline = new codepipeline.Pipeline(this, 'pipeline', {
       pipelineName: `${id}-pipeline`,
-      artifactBucket: s3.Bucket.fromBucketArn(this, 'ArtifactBucketByArn', 'arn:aws:s3:::account-codepipeline-artifacts'),
+      artifactBucket: s3.Bucket.fromBucketArn(this, 'ArtifactBucketByArn', 'arn:aws:s3:::pit-pipeline-artifact-store'),
       restartExecutionOnUpdate: true
     });
 
     pipeline.addStage({
       stageName: 'Source',
       actions: [
-        new codepipelineActions.GitHubSourceAction({
+        new codepipelineActions.CodeCommitSourceAction({
+          actionName: 'CodeCommit_Source',
+          repository: code,
+          output: outputSources,
+        })
+        /*new codepipelineActions.GitHubSourceAction({
           actionName: 'Checkout',
           owner: props.github.owner,
           repo: props.github.repository,
@@ -40,7 +51,7 @@ export class SimpleWebsitePipeline extends cdk.Construct {
           oauthToken: cdk.SecretValue.plainText(props.github.oauthToken),
           output: outputSources,
           trigger: codepipelineActions.GitHubTrigger.WEBHOOK
-        })
+        })*/
       ]
     });
 

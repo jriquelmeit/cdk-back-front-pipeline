@@ -24,7 +24,7 @@ export class SimpleBackendPipeline extends cdk.Construct {
 
     const pipeline = new codepipeline.Pipeline(this, 'pipeline', {
       pipelineName: `${id}-pipeline`,
-      artifactBucket: s3.Bucket.fromBucketArn(this, 'ArtifactBucketByArn', 'arn:aws:s3:::pit-pipeline-artifact-store'),
+      artifactBucket: s3.Bucket.fromBucketArn(this, 'ArtifactBucketByArn', `arn:aws:s3:::${props.cfTemplate}`),
       restartExecutionOnUpdate: true
     });
 
